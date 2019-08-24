@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.brt.duet.dao.CommonDao">
+
+	<sql id="mapInsert">
+		<foreach collection="mapInsert.keys" item="key" separator="," open="(" close=")">
+			${key}
+		</foreach>
+		VALUES
+		<foreach collection="mapInsert" item="value" index="key" separator="," open="(" close=")">
+			#{value}
+		</foreach>
+	</sql>
+
+	<sql id="mapUpdate">
+		<if test="mapUpdate != null and mapUpdate.keys.size() > 0">
+			<foreach collection="mapUpdate" item="value" index="key" separator=",">
+				${key} = #{value}
+			</foreach>
+		</if>
+	</sql>
+	
+	<sql id="mapWhere">
+		<if test="mapWhere != null and mapWhere.keys.size() > 0">
+			AND
+			<foreach collection="mapWhere" item="value" index="key" separator="and">
+				<if test="mapWhere[key] != null and mapWhere[key].size() > 0">
+					<foreach collection="mapWhere[key]" item="item" index="index" separator="or" open=" ( " close=" ) ">
+						${item.columnName} ${item.operator} #{item.dataScope}
+					</foreach>
+				</if>
+			</foreach>
+		</if>
+	</sql>
+	
+	<sql id="columns">
+	    <choose>
+			<when test="columns != null and columns.size() > 0">
+				<foreach collection="columns" item="value" index="key" separator=",">
+				    ${value}
+			    </foreach>
+			</when>
+			<otherwise>
+				<include refid="defaultColumn" />
+			</otherwise>
+		</choose>
+	</sql>
+	
+	<sql id="batchInsert">
+		<if test="list != null and list.size() > 0">
+			<foreach collection="list[0]" item="value" index="key" separator="," open=" ( " close=" ) ">
+				${key}
+			</foreach>
+			VALUES
+			<foreach collection="list" item="item" index="index" separator=",">
+				<foreach collection="item" item="value" index="key" separator="," open=" ( " close=" ) ">
+				    #{value}
+				</foreach>
+			</foreach>
+		</if>
+	</sql>
+
+	<sql id="queryColumn">
+		<choose>
+			<when test="listField != null and listField.size() > 0">
+				<foreach collection="listField" index="index" item="item" separator=",">
+					${item}
+				</foreach>
+			</when>
+			<otherwise>
+				<include refid="defaultColumn" />
+			</otherwise>
+		</choose>
+	</sql>
+
+	<sql id="mapEqual">
+		<if test="mapEqual != null and mapEqual.keys.size() > 0">
+			AND
+			<foreach collection="mapEqual" item="value" index="key" separator="and">
+				${key} = #{value}
+			</foreach>
+		</if>
+	</sql>
+
+	<sql id="mapLike">
+		<if test="mapLike != null and mapLike.keys.size() > 0">
+			AND
+			<foreach collection="mapLike" item="value" index="key" separator="and">
+				<if test="null != mapLike[key]">
+					${key} LIKE CONCAT(CONCAT('%',#{value}),'%')
+				</if>
+			</foreach>
+		</if>
+	</sql>
+
+	<sql id="mapScope">
+		<if test="mapScope != null and mapScope.keys.size() > 0">
+			AND
+			<foreach collection="mapScope.keys" item="k" separator="and">
+				<if test="null != mapScope[k]">
+					${k} IN
+					<foreach collection="mapScope[k]" index="index" item="item" open="(" separator="," close=")">
+						#{item}
+					</foreach>
+				</if>
+			</foreach>
+		</if>
+	</sql>
+
+	<sql id="dataSchema">
+		<choose>
+			<when test="dataSchema!=null and dataSchema!=''">
+				${dataSchema}
+			</when>
+			<otherwise>
+				<include refid="defaultColumn" />
+			</otherwise>
+		</choose>
+	</sql>
+
+	<sql id="dataScope">
+		<if test="dataScope != null and dataScope.keys.size() > 0">
+			AND
+			<foreach collection="dataScope" item="value" index="key" separator="and">
+				<if test="dataScope[key] != null and dataScope[key].size() > 0">
+					<foreach collection="dataScope[key]" item="item" index="index" separator="or" open=" ( " close=" ) ">
+						${item.columnName} ${item.operator} ${item.dataScope}
+					</foreach>
+				</if>
+			</foreach>
+		</if>
+	</sql>
+	
+	<sql id="mapTime">
+		<if test="mapTime != null and mapTime.size() > 0">
+			AND
+			<foreach collection="mapTime" item="item" index="index" separator="AND">
+				<if test="item != null and item.keys.size() == 3">
+					${item.columnName} BETWEEN #{item.startTime} AND #{item.endTime}
+				</if>
+			</foreach>
+		</if>
+	</sql>
+
+</mapper>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.brt.duet.dao.sys.UserRoleDao">
+    <resultMap id="resultMap" type="java.util.Map">
+        <result property="userId" column="user_id" />
+        <result property="roleId" column="role_id" />
+        <result property="createAt" column="create_at" />
+    </resultMap>
+
+    <sql id="defaultColumn">
+        sys_user_role.user_id,
+        sys_user_role.role_id,
+        sys_user_role.create_at
+    </sql>
+
+    <insert id="insert">
+        INSERT INTO sys_user_role <include refid="com.brt.duet.dao.CommonDao.mapInsert"/>
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM sys_user_role
+        <where>
+            <include refid="com.brt.duet.dao.CommonDao.mapWhere"/>
+        </where>
+    </delete>
+
+    <update id="update">
+        UPDATE sys_user_role
+        SET <include refid="com.brt.duet.dao.CommonDao.mapUpdate"/>
+        <where>
+            <include refid="com.brt.duet.dao.CommonDao.mapWhere"/>
+        </where>
+    </update>
+
+    <select id="select" resultMap="resultMap">
+        SELECT <include refid="com.brt.duet.dao.CommonDao.columns"/>
+        FROM sys_user_role
+        <where>
+            <include refid="com.brt.duet.dao.CommonDao.mapWhere"/>
+        </where>
+    </select>
+    
+    <insert id="batchInsert">
+    	INSERT INTO sys_user_role <include refid="com.brt.duet.dao.CommonDao.batchInsert"/>
+    </insert>
+    
+</mapper>

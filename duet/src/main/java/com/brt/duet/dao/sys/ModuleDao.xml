@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.brt.duet.dao.sys.ModuleDao">
+    <resultMap id="resultMap" type="java.util.Map">
+        <id property="id" column="id" />
+        <result property="createAt" column="create_at" />
+        <result property="updateAt" column="update_at" />
+        <result property="name" column="name" />
+        <result property="title" column="title" />
+        <result property="code" column="code" />
+        <result property="parentId" column="parent_id" />
+        <result property="uri" column="uri" />
+        <result property="icon" column="icon" />
+        <result property="sort" column="sort" />
+        <result property="isMenu" column="is_menu" />
+    </resultMap>
+
+    <sql id="defaultColumn">
+        sys_module.id,
+        sys_module.create_at,
+        sys_module.update_at,
+        sys_module.name,
+        sys_module.title,
+        sys_module.code,
+        sys_module.parent_id,
+        sys_module.uri,
+        sys_module.icon,
+        sys_module.sort,
+        sys_module.is_menu
+    </sql>
+
+    <insert id="insert">
+        INSERT INTO sys_module <include refid="com.brt.duet.dao.CommonDao.mapInsert"/>
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM sys_module
+        <where>
+            <include refid="com.brt.duet.dao.CommonDao.mapWhere"/>
+        </where>
+    </delete>
+
+    <update id="update">
+        UPDATE sys_module
+        SET <include refid="com.brt.duet.dao.CommonDao.mapUpdate"/>
+        <where>
+            <include refid="com.brt.duet.dao.CommonDao.mapWhere"/>
+        </where>
+    </update>
+
+    <select id="select" resultMap="resultMap">
+        SELECT <include refid="com.brt.duet.dao.CommonDao.columns"/>
+        FROM sys_module
+        <where>
+            <include refid="com.brt.duet.dao.CommonDao.mapWhere"/>
+        </where>
+    </select>
+    
+    <select id="getModulesByRoleId" resultMap="resultMap">
+        SELECT sys_module.id, sys_module.name, sys_module.title
+        FROM sys_module, sys_role_module
+        <where>
+            sys_role_module.role_id = #{roleId}
+            AND sys_role_module.module_id = sys_module.id
+        </where>
+    </select>
+    
+    <select id="getModulesByUserId" resultMap="resultMap">
+    	SELECT DISTINCT
+    	    sys_module.id,
+	        sys_module.name,
+	        sys_module.title,
+	        sys_module.code,
+	        sys_module.parent_id,
+	        sys_module.uri,
+	        sys_module.icon,
+	        sys_module.sort,
+	        sys_module.is_menu
+	    FROM sys_user_role
+	    INNER JOIN sys_role_module
+	    ON sys_user_role.user_id = #{userId}
+	    AND sys_user_role.role_id = sys_role_module.role_id
+	    INNER JOIN sys_module
+	    ON sys_role_module.module_id = sys_module.id
+    </select>
+
+</mapper>
