@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.brt.duet.dao.sys.LogDao">
+    <resultMap id="resultMap" type="java.util.Map">
+        <id property="id" column="id" />
+        <result property="operationEvent" column="operation_event" />
+        <result property="operationType" column="operation_type" />
+        <result property="success" column="success" />
+        <result property="operationUserId" column="operation_user_id" />
+        <result property="operationUsername" column="operation_username" />
+        <result property="remoteAddr" column="remote_addr" />
+        <result property="userAgent" column="user_agent" />
+        <result property="requestUri" column="request_uri" />
+        <result property="method" column="method" />
+        <result property="params" column="params" />
+        <result property="exception" column="exception" />
+        <result property="createAt" column="create_at" />
+    </resultMap>
+
+    <sql id="defaultColumn">
+        sys_log.id,
+        sys_log.operation_event,
+        sys_log.operation_type,
+        sys_log.success,
+        sys_log.operation_user_id,
+        sys_log.operation_username,
+        sys_log.remote_addr,
+        sys_log.user_agent,
+        sys_log.request_uri,
+        sys_log.method,
+        sys_log.params,
+        sys_log.exception,
+        sys_log.create_at
+    </sql>
+
+    <insert id="insert">
+        INSERT INTO sys_log <include refid="com.brt.duet.dao.CommonDao.mapInsert"/>
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM sys_log
+        <where>
+            <include refid="com.brt.duet.dao.CommonDao.mapWhere"/>
+        </where>
+    </delete>
+
+    <update id="update">
+        UPDATE sys_log
+        SET <include refid="com.brt.duet.dao.CommonDao.mapUpdate"/>
+        <where>
+            <include refid="com.brt.duet.dao.CommonDao.mapWhere"/>
+        </where>
+    </update>
+
+    <select id="select" resultMap="resultMap">
+        SELECT <include refid="com.brt.duet.dao.CommonDao.columns"/>
+        FROM sys_log
+        <where>
+            <include refid="com.brt.duet.dao.CommonDao.mapWhere"/>
+        </where>
+    </select>
+
+</mapper>

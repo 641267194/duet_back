@@ -50,7 +50,7 @@ public class NewMysqlUtil {
 	/**
 	 * @description 对应表名,使用%表示所有表
 	 */
-	static String table = "sys_role";
+	static String table = "sys_log";
 	/**
 	 * @description 对应数据库
 	 */
@@ -130,7 +130,7 @@ public class NewMysqlUtil {
 					fop.write(newLine.getBytes());
 					fop.write(("     */").getBytes());
 					fop.write(newLine.getBytes());
-					fop.write(("    TableColumn " + columnName.toUpperCase() + " =  new TableColumn(\"" + key + "\", \"" + tableColumn + "\", " + columns.getInt("DATA_TYPE") + ", null);").getBytes());
+					fop.write(("    TableColumn " + columnName.toUpperCase() + " = new TableColumn(\"" + key + "\", \"" + tableColumn + "\", " + columns.getInt("DATA_TYPE") + ", null);").getBytes());
 					fop.write(newLine.getBytes());
 				}
 

@@ -157,7 +157,7 @@ public class OSSClientUtil {
 	    	ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 			String path = uploadPath+"/"+DateUtil.getYmd();
 			String filename = uploadFile.getOriginalFilename();
-			String realPath = path+IDUtils.getUUID()+"."+ext;
+			String realPath = path+IDUtil.getUUID()+"."+ext;
 			ObjectMetadata obj = new ObjectMetadata();
 			obj.setContentDisposition("attachment;filename=\"" + filename + "\"");
 	    	ossClient.putObject(bucket, realPath, uploadFile.getInputStream(), obj);
@@ -218,7 +218,7 @@ public class OSSClientUtil {
 	    		String ext = getFileExt(uploadFile);
 	    		String path = uploadPath+"/"+DateUtil.getYmd();
 				String filename = uploadFile.getOriginalFilename();
-				String realPath = path+IDUtils.getUUID()+"."+ext;
+				String realPath = path+IDUtil.getUUID()+"."+ext;
 				ObjectMetadata obj = new ObjectMetadata();
 				obj.setContentDisposition("attachment;filename=\"" + filename + "\"");
 		    	ossClient.putObject(bucket, realPath, uploadFile.getInputStream(), obj);
@@ -264,7 +264,7 @@ public class OSSClientUtil {
 	    	ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 	    	String path = uploadPath+"/"+DateUtil.getYmd();
 			String filename = uploadFile.getOriginalFilename();
-			String realPath = path+IDUtils.getUUID()+"."+ext;
+			String realPath = path+IDUtil.getUUID()+"."+ext;
 			ObjectMetadata obj = new ObjectMetadata();
 			obj.setContentDisposition("attachment;filename=\"" + filename + "\"");
 	    	ossClient.putObject(bucket, realPath, uploadFile.getInputStream(), obj);
@@ -313,7 +313,7 @@ public class OSSClientUtil {
 	    		String ext = getFileExt(uploadFile);
 	    		String path = uploadPath+"/"+DateUtil.getYmd();
 				String filename = uploadFile.getOriginalFilename();
-				String realPath = path+IDUtils.getUUID()+"."+ext;
+				String realPath = path+IDUtil.getUUID()+"."+ext;
 				ObjectMetadata obj = new ObjectMetadata();
 				obj.setContentDisposition("attachment;filename=\"" + filename + "\"");
 		    	ossClient.putObject(bucket, realPath, uploadFile.getInputStream(), obj);

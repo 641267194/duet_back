@@ -54,4 +54,8 @@ public interface RegexConstant {
 	 * @description pageSize最大为9999,防止内存溢出
 	 */
 	String PAGE_SIZE = "^[1-9][0-9]{0,3}$";
+	/**
+	 * @description 18位整数,2位小数
+	 */
+	String NUMERICAL_VALUE = "^\\-{0,1}(([1-9]{1}([0-9]{0,17}))|(0{1}))(\\.[0-9]{0,2})?$";
 }

@@ -2,7 +2,7 @@ package com.brt.duet.util;
 
 import java.util.UUID;
 
-public class IDUtils {
+public class IDUtil {
 	public static String getUUID(){
 		String date = DateUtil.getYmdhmss();
 		String uuid = UUID.randomUUID().toString().replace("-", "");

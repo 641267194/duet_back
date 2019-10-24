@@ -26,6 +26,6 @@ public class ValidateUtil {
 	}
 	
 	public static void main(String[] args) {
-		System.out.println(match("^[1-9][0-9]{0,3}$","9999"));
+		System.out.println(match("^0|([1-9][0-9]{0,8})$","1234567890"));
 	}
 }

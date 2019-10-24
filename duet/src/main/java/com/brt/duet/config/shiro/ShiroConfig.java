@@ -1,11 +1,15 @@
 package com.brt.duet.config.shiro;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.Filter;
 
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.realm.Realm;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -14,6 +18,12 @@ import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreato
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+
+import com.brt.duet.config.shiro.matcher.PhoneCodeMatcher;
+import com.brt.duet.config.shiro.matcher.UsernamePasswordMatcher;
+import com.brt.duet.config.shiro.realm.PhoneCodeRealm;
+import com.brt.duet.config.shiro.realm.UsernamePasswordRealm;
+import com.brt.duet.config.shiro.token.PhoneCodeToken;
 
 /**
  * @author 方杰
@@ -61,21 +71,38 @@ public class ShiroConfig {
 	@Bean
 	public SecurityManager securityManager() {
 		DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
-		//设置Realm为重写的UserRealm
-		securityManager.setRealm(userRealm());
+		Set<Realm> realms = new HashSet<>();
+		realms.add(usernamePasswordRealm());
+		realms.add(phoneCodeRealm());
+		securityManager.setRealms(realms);
 		return securityManager;
 	}
 
 	/**
 	 * @author 方杰
 	 * @date 2019年7月22日
-	 * @return 
+	 * @return 用户名密码验证
 	 * @description Shiro Realm 继承自AuthorizingRealm的自定义Realm,即指定Shiro验证用户登录的类为自定义的
 	 */
 	@Bean
-	public UserRealm userRealm() {
-		UserRealm userRealm = new UserRealm();
-		userRealm.setCredentialsMatcher(new CredentialsMatcher());
+	public UsernamePasswordRealm usernamePasswordRealm() {
+		UsernamePasswordRealm userRealm = new UsernamePasswordRealm();
+		userRealm.setAuthenticationTokenClass(UsernamePasswordToken.class);
+		userRealm.setCredentialsMatcher(new UsernamePasswordMatcher());
+		return userRealm;
+	}
+	
+	/**
+	 * @author 方杰
+	 * @date 2019年7月22日
+	 * @return 手机验证码验证
+	 * @description Shiro Realm 继承自AuthorizingRealm的自定义Realm,即指定Shiro验证用户登录的类为自定义的
+	 */
+	@Bean
+	public PhoneCodeRealm phoneCodeRealm() {
+		PhoneCodeRealm userRealm = new PhoneCodeRealm();
+		userRealm.setAuthenticationTokenClass(PhoneCodeToken.class);
+		userRealm.setCredentialsMatcher(new PhoneCodeMatcher());
 		return userRealm;
 	}
 	

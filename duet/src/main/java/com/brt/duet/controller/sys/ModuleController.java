@@ -24,7 +24,7 @@ import com.brt.duet.constant.table.sys.ModuleConstant;
 import com.brt.duet.constant.table.sys.RoleModuleConstant;
 import com.brt.duet.service.sys.ModuleService;
 import com.brt.duet.service.sys.RoleModuleService;
-import com.brt.duet.util.IDUtils;
+import com.brt.duet.util.IDUtil;
 import com.brt.duet.util.MybatisUtil;
 import com.brt.duet.util.ResponseUtil;
 import com.brt.duet.util.TreeUtil;
@@ -100,6 +100,16 @@ public class ModuleController {
 				return ResponseUtil.responseResult(false, "模块编码不符合规则", null);
 			}
 			
+			//验证模块的父模块id
+			if (infoJson.containsKey(ModuleConstant.PARENT_ID.getKey())) {
+				String parentId = infoJson.getString(ModuleConstant.PARENT_ID.getKey());
+				if (ValidateUtil.match(ModuleConstant.PARENT_ID.getRegex(), parentId)) {
+					mapInsert.put(ModuleConstant.PARENT_ID.getTableColumn(), parentId);
+				} else {
+					return ResponseUtil.responseResult(false, "父ID不符合规则", null);
+				}
+			}
+			
 			//验证链接地址
 			if (infoJson.containsKey(ModuleConstant.URI.getKey())) {
 				String uri = infoJson.getString(ModuleConstant.URI.getKey());
@@ -116,27 +126,6 @@ public class ModuleController {
 				}
 			} else {
 				return ResponseUtil.responseResult(false, "连接地址不能为空", null);
-			}
-			
-			//验证是否是菜单
-			if (infoJson.containsKey(ModuleConstant.IS_MENU.getKey())) {
-				if (ValidateUtil.match(ModuleConstant.IS_MENU.getRegex(), infoJson.getString(ModuleConstant.IS_MENU.getKey()))) {
-					mapInsert.put(ModuleConstant.IS_MENU.getTableColumn(), infoJson.getBoolean(ModuleConstant.IS_MENU.getKey()));
-				} else {
-					return ResponseUtil.responseResult(false, "是否是菜单不符合规则", null);
-				}
-			} else {
-				mapInsert.put(ModuleConstant.IS_MENU.getTableColumn(), 0);
-			}
-			
-			//验证父ID
-			if (infoJson.containsKey(ModuleConstant.PARENT_ID.getKey())) {
-				String parentId = infoJson.getString(ModuleConstant.PARENT_ID.getKey());
-				if (ValidateUtil.match(ModuleConstant.PARENT_ID.getRegex(), parentId)) {
-					mapInsert.put(ModuleConstant.PARENT_ID.getTableColumn(), parentId);
-				} else {
-					return ResponseUtil.responseResult(false, "父ID不符合规则", null);
-				}
 			}
 			
 			//验证模块图标
@@ -159,7 +148,18 @@ public class ModuleController {
 				}
 			}
 			
-			String id = IDUtils.getUUID();
+			//验证是否是菜单
+			if (infoJson.containsKey(ModuleConstant.IS_MENU.getKey())) {
+				if (ValidateUtil.match(ModuleConstant.IS_MENU.getRegex(), infoJson.getString(ModuleConstant.IS_MENU.getKey()))) {
+					mapInsert.put(ModuleConstant.IS_MENU.getTableColumn(), infoJson.getBoolean(ModuleConstant.IS_MENU.getKey()));
+				} else {
+					return ResponseUtil.responseResult(false, "是否是菜单不符合规则", null);
+				}
+			} else {
+				mapInsert.put(ModuleConstant.IS_MENU.getTableColumn(), 0);
+			}
+			
+			String id = IDUtil.getUUID();
 			mapInsert.put(ModuleConstant.ID.getTableColumn(), id);
 
 			if (moduleService.insert(mapInsert) > 0) {
@@ -222,7 +222,44 @@ public class ModuleController {
             
             Map<String, Object> mapUpdate = new HashMap<>();
             
-            // 验证父ID
+            // 验证模块名称
+            if (infoJson.containsKey(ModuleConstant.NAME.getKey())) {
+	            String name = infoJson.getString(ModuleConstant.NAME.getKey());
+	            if (ValidateUtil.match(ModuleConstant.NAME.getRegex(), name)) {
+	            	mapUpdate.put(ModuleConstant.NAME.getTableColumn(), name);
+	            } else {
+	            	return ResponseUtil.responseResult(false, "模块名称不符合规则", null);
+	            }
+            }
+            
+            // 验证模块标题
+            if (infoJson.containsKey(ModuleConstant.TITLE.getKey())) {
+	            String title = infoJson.getString(ModuleConstant.TITLE.getKey());
+	            if (ValidateUtil.match(ModuleConstant.TITLE.getRegex(), title)) {
+	            	mapUpdate.put(ModuleConstant.TITLE.getTableColumn(), title);
+	            } else {
+	            	return ResponseUtil.responseResult(false, "模块标题不符合规则", null);
+	            }
+            }
+            
+            // 验证模块编码
+            if (infoJson.containsKey(ModuleConstant.CODE.getKey())) {
+	            String code = infoJson.getString(ModuleConstant.CODE.getKey());
+	            if (ValidateUtil.match(ModuleConstant.CODE.getRegex(), code)) {
+	            	Map<String, List<Map<String, Object>>> mapWhere = MybatisUtil.addMapWhere(null,ModuleConstant.CODE.getTableColumn(), OperatorConstant.EQUAL_TO, code);
+					Page<Map<String, Object>> modules = moduleService.select(null, mapWhere);
+					if (modules.size() > 0) {
+						if(modules.size() != 1 || !id.equals(modules.get(0).get(ModuleConstant.ID.getKey()).toString())) {
+							return ResponseUtil.responseResult(false, "模块编码已存在", null);
+						}
+					}
+					mapUpdate.put(ModuleConstant.CODE.getTableColumn(), code);
+	            } else {
+	            	return ResponseUtil.responseResult(false, "模块编码不符合规则", null);
+	            }
+            }
+            
+            //验证模块的父模块id
             if (infoJson.containsKey(ModuleConstant.PARENT_ID.getKey())) {
             	String parentId = infoJson.getString(ModuleConstant.PARENT_ID.getKey());
             	if (ValidateUtil.match(ModuleConstant.PARENT_ID.getRegex(), parentId)) {
@@ -230,25 +267,6 @@ public class ModuleController {
                 } else {
                 	return ResponseUtil.responseResult(false, "父ID不符合规则", null);
                 }
-            }
-            // 验证模块名称
-            if (infoJson.containsKey(ModuleConstant.TITLE.getKey())) {
-	            String title = infoJson.getString(ModuleConstant.TITLE.getKey());
-	            if (ValidateUtil.match(ModuleConstant.TITLE.getRegex(), title)) {
-	            	mapUpdate.put(ModuleConstant.TITLE.getTableColumn(), title);
-	            } else {
-	            	return ResponseUtil.responseResult(false, "模块名称不符合规则", null);
-	            }
-            }
-            
-            //验证模块编码
-            if (infoJson.containsKey(ModuleConstant.CODE.getKey())) {
-	            String code = infoJson.getString(ModuleConstant.CODE.getKey());
-	            if (ValidateUtil.match(ModuleConstant.CODE.getRegex(), code)) {
-	            	mapUpdate.put(ModuleConstant.CODE.getTableColumn(), code);
-	            } else {
-	            	return ResponseUtil.responseResult(false, "模块编码不符合规则", null);
-	            }
             }
             
             //验证链接地址 ---------------------
@@ -268,6 +286,16 @@ public class ModuleController {
 	            	return ResponseUtil.responseResult(false, "链接地址不符合规则", null);
 	            }
             }
+            
+            //验证模块图标
+			if (infoJson.containsKey(ModuleConstant.ICON.getKey())) {
+				String icon = infoJson.getString(ModuleConstant.ICON.getKey());
+				if (ValidateUtil.match(ModuleConstant.ICON.getRegex(), icon)) {
+					mapUpdate.put(ModuleConstant.ICON.getTableColumn(), icon);
+				} else {
+					return ResponseUtil.responseResult(false, "模块图标不符合规则", null);
+				}
+			}
 
             //验证排序
             if (infoJson.containsKey(ModuleConstant.SORT.getKey())) {
@@ -278,15 +306,6 @@ public class ModuleController {
 	            	return ResponseUtil.responseResult(false, "描述不符合规则", null);
 	            }
             }
-            //验证模块图标
-			if (infoJson.containsKey(ModuleConstant.ICON.getKey())) {
-				String icon = infoJson.getString(ModuleConstant.ICON.getKey());
-				if (ValidateUtil.match(ModuleConstant.ICON.getRegex(), icon)) {
-					mapUpdate.put(ModuleConstant.ICON.getTableColumn(), icon);
-				} else {
-					return ResponseUtil.responseResult(false, "模块图标不符合规则", null);
-				}
-			}
             
 			//验证是否是菜单
 			if (infoJson.containsKey(ModuleConstant.IS_MENU.getKey())) {
@@ -384,15 +403,15 @@ public class ModuleController {
 			if (searchJson.containsKey(ModuleConstant.IS_MENU.getKey())) {
 				if (ValidateUtil.match(ModuleConstant.IS_MENU.getRegex(), searchJson.getString(ModuleConstant.IS_MENU.getKey()))) {
 					Boolean isMenu = searchJson.getBoolean(ModuleConstant.IS_MENU.getKey());
-					mapWhere = MybatisUtil.addMapWhere(mapWhere, ModuleConstant.IS_MENU.getTableColumn(), OperatorConstant.LIKE, isMenu);
+					mapWhere = MybatisUtil.addMapWhere(mapWhere, ModuleConstant.IS_MENU.getTableColumn(), OperatorConstant.EQUAL_TO, isMenu);
 				} else {
 					return ResponseUtil.responseResult(false, "是否是菜单不符合规则", null);
 				}
 			}
 			
 			// 模块名称验证
-			if (searchJson.containsKey(ModuleConstant.NAME.getKey())) {
-				String name = searchJson.getString(ModuleConstant.NAME.getKey());
+			String name = searchJson.getString(ModuleConstant.NAME.getKey());
+			if (StringUtils.isNotBlank(name)) {
 				if (ValidateUtil.match(ModuleConstant.NAME.getRegex(), name)) {
 					mapWhere = MybatisUtil.addMapWhere(mapWhere, ModuleConstant.NAME.getTableColumn(), OperatorConstant.LIKE, name);
 				} else {
@@ -401,8 +420,8 @@ public class ModuleController {
 			}
 			
 			// 模块标题验证
-			if (searchJson.containsKey(ModuleConstant.TITLE.getKey())) {
-				String title = searchJson.getString(ModuleConstant.TITLE.getKey());
+			String title = searchJson.getString(ModuleConstant.TITLE.getKey());
+			if (StringUtils.isNotBlank(title)) {
 				if (ValidateUtil.match(ModuleConstant.TITLE.getRegex(), title)) {
 					mapWhere = MybatisUtil.addMapWhere(mapWhere, ModuleConstant.TITLE.getTableColumn(), OperatorConstant.LIKE, title);
 				} else {
@@ -411,8 +430,8 @@ public class ModuleController {
 			}
 			
 			// 模块编码验证
-			if (searchJson.containsKey(ModuleConstant.CODE.getKey())) {
-				String code = searchJson.getString(ModuleConstant.CODE.getKey());
+			String code = searchJson.getString(ModuleConstant.CODE.getKey());
+			if (StringUtils.isNotBlank(code)) {
 				if (ValidateUtil.match(ModuleConstant.CODE.getRegex(), code)) {
 					mapWhere = MybatisUtil.addMapWhere(mapWhere, ModuleConstant.CODE.getTableColumn(), OperatorConstant.LIKE, code);
 				} else {

@@ -114,7 +114,7 @@ public class MeController {
 				SecurityUtils.getSubject().getSession().setTimeout(3000);
 				return ResponseUtil.responseResult(true, "修改成功,请重新登录", null);
 			} else {
-				return ResponseUtil.responseResult(true, "旧密码错误", null);
+				return ResponseUtil.responseResult(false, "旧密码错误", null);
 			}
 		}
 	}

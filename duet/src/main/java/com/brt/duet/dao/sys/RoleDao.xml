@@ -4,6 +4,7 @@
     <resultMap id="resultMap" type="java.util.Map">
         <id property="id" column="id" />
         <result property="name" column="name" />
+        <result property="code" column="code" />
         <result property="createAt" column="create_at" />
         <result property="updateAt" column="update_at" />
         <collection property="modules" column="modules" select="com.brt.duet.dao.sys.ModuleDao.getModulesByRoleId"></collection>
@@ -12,6 +13,7 @@
     <sql id="defaultColumn">
         sys_role.id,
         sys_role.name,
+        sys_role.code,
         sys_role.create_at,
         sys_role.update_at
     </sql>
@@ -44,7 +46,7 @@
     </select>
     
     <select id="getRolesByUserId" resultMap="resultMap">
-    	SELECT sys_role.id, sys_role.name
+    	SELECT sys_role.id, sys_role.name, sys_role.code
     	FROM sys_role, sys_user_role
     	<where>
     	    sys_user_role.user_id = #{userId}

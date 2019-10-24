@@ -26,7 +26,7 @@ import com.brt.duet.constant.table.sys.RoleModuleConstant;
 import com.brt.duet.constant.table.sys.UserRoleConstant;
 import com.brt.duet.service.sys.RoleService;
 import com.brt.duet.service.sys.UserRoleService;
-import com.brt.duet.util.IDUtils;
+import com.brt.duet.util.IDUtil;
 import com.brt.duet.util.MybatisUtil;
 import com.brt.duet.util.ResponseUtil;
 import com.brt.duet.util.ValidateUtil;
@@ -45,7 +45,7 @@ public class RoleController {
 
 	@Autowired
 	private RoleService roleService;
-	
+
 	@Autowired
 	private UserRoleService userRoleService;
 
@@ -77,10 +77,17 @@ public class RoleController {
 			} else {
 				return ResponseUtil.responseResult(false, "角色名不能为空", null);
 			}
+			// 验证编码
+			String code = infoJson.getString(RoleConstant.CODE.getKey());
+			if (ValidateUtil.match(code, RoleConstant.CODE.getRegex())) {
+				mapInsert.put(RoleConstant.CODE.getTableColumn(), code);
+			} else {
+				return ResponseUtil.responseResult(false, "角色编码不符合规则", null);
+			}
 			// id
-			String id = IDUtils.getUUID();
+			String id = IDUtil.getUUID();
 			mapInsert.put(RoleConstant.ID.getTableColumn(), id);
-			
+
 			List<Map<String, Object>> roleModules = new ArrayList<>();
 			// 验证modules是否合法
 			if (infoJson.containsKey(RoleConstant.MODULES.getKey())) {
@@ -166,9 +173,18 @@ public class RoleController {
 					return ResponseUtil.responseResult(false, "角色名不符合规则", null);
 				}
 			}
-			
+			// 验证编码
+			if (infoJson.containsKey(RoleConstant.CODE.getKey())) {
+				String code = infoJson.getString(RoleConstant.CODE.getKey());
+				if (ValidateUtil.match(RoleConstant.CODE.getRegex(), code)) {
+					mapUpdate.put(RoleConstant.CODE.getTableColumn(), code);
+				} else {
+					return ResponseUtil.responseResult(false, "角色编码不符合规则", null);
+				}
+			}
+
 			Map<String, List<Map<String, Object>>> mapWhere = MybatisUtil.addMapWhere(null, RoleConstant.ID.getTableColumn(), OperatorConstant.EQUAL_TO, id);
-			
+
 			List<Map<String, Object>> roleModules = new ArrayList<>();
 			// 验证modules是否合法
 			if (infoJson.containsKey(RoleConstant.MODULES.getKey())) {
@@ -212,12 +228,13 @@ public class RoleController {
 			Set<String> columns = new HashSet<>();
 			columns.add(RoleConstant.ID.getTableColumn());
 			columns.add(RoleConstant.NAME.getTableColumn());
+			columns.add(RoleConstant.CODE.getTableColumn());
 			columns.add(RoleConstant.CREATE_AT.getTableColumn());
 			columns.add(RoleConstant.UPDATE_AT.getTableColumn());
 			columns.add(RoleConstant.MODULES.getTableColumn());
-			
+
 			Map<String, List<Map<String, Object>>> mapWhere = MybatisUtil.addMapWhere(null, RoleConstant.ID.getTableColumn(), OperatorConstant.EQUAL_TO, id);
-			
+
 			Page<Map<String, Object>> roles = roleService.select(columns, mapWhere);
 			if (roles != null && roles.size() == 1) {
 				return ResponseUtil.responseResult(true, "查询成功", roles.get(0));
@@ -264,23 +281,33 @@ public class RoleController {
 
 		if (searchJson != null) {
 			// 角色名验证
-			if (searchJson.containsKey(RoleConstant.NAME.getKey())) {
-				String name = searchJson.getString(RoleConstant.NAME.getKey());
+			String name = searchJson.getString(RoleConstant.NAME.getKey());
+			if (StringUtils.isNotBlank(name)) {
 				if (ValidateUtil.match(RoleConstant.NAME.getRegex(), name)) {
 					mapWhere = MybatisUtil.addMapWhere(mapWhere, RoleConstant.NAME.getTableColumn(), OperatorConstant.LIKE, name);
 				} else {
 					return ResponseUtil.responseResult(false, "角色名不符合规则", null);
 				}
 			}
+			// 角色名验证
+			String code = searchJson.getString(RoleConstant.CODE.getKey());
+			if (StringUtils.isNotBlank(code)) {
+				if (ValidateUtil.match(RoleConstant.CODE.getRegex(), code)) {
+					mapWhere = MybatisUtil.addMapWhere(mapWhere, RoleConstant.CODE.getTableColumn(), OperatorConstant.LIKE, code);
+				} else {
+					return ResponseUtil.responseResult(false, "角色编码不符合规则", null);
+				}
+			}
 		}
-		
+
 		// 过滤要查询的列
 		Set<String> columns = new HashSet<>();
 		columns.add(RoleConstant.ID.getTableColumn());
 		columns.add(RoleConstant.NAME.getTableColumn());
+		columns.add(RoleConstant.CODE.getTableColumn());
 		columns.add(RoleConstant.CREATE_AT.getTableColumn());
 		columns.add(RoleConstant.UPDATE_AT.getTableColumn());
-		
+
 		Page<Map<String, Object>> list = roleService.select(columns, mapWhere);
 		return ResponseUtil.responseResult(true, "查询成功", new PageInfo<>(list));
 	}

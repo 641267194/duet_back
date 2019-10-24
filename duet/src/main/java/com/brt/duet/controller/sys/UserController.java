@@ -26,7 +26,7 @@ import com.brt.duet.constant.RegexConstant;
 import com.brt.duet.constant.table.sys.UserConstant;
 import com.brt.duet.constant.table.sys.UserRoleConstant;
 import com.brt.duet.service.sys.UserService;
-import com.brt.duet.util.IDUtils;
+import com.brt.duet.util.IDUtil;
 import com.brt.duet.util.MybatisUtil;
 import com.brt.duet.util.ResponseUtil;
 import com.brt.duet.util.ValidateUtil;
@@ -118,7 +118,7 @@ public class UserController {
 				mapInsert.put(UserConstant.ENABLED.getTableColumn(), 0);
 			}
 			// id
-			String id = IDUtils.getUUID();
+			String id = IDUtil.getUUID();
 			mapInsert.put(UserConstant.ID.getTableColumn(), id);
 
 			List<Map<String, Object>> userRoles = new ArrayList<>();
@@ -321,8 +321,8 @@ public class UserController {
 
 		if (searchJson != null) {
 			// 用户名验证
-			if (searchJson.containsKey(UserConstant.USERNAME.getKey())) {
-				String username = searchJson.getString(UserConstant.USERNAME.getKey());
+			String username = searchJson.getString(UserConstant.USERNAME.getKey());
+			if (StringUtils.isNotBlank(username)) {
 				if (ValidateUtil.match("^[A-Za-z0-9_]{1,50}$", username)) {
 					mapWhere = MybatisUtil.addMapWhere(mapWhere, UserConstant.USERNAME.getTableColumn(), OperatorConstant.LIKE, username);
 				} else {
@@ -330,8 +330,8 @@ public class UserController {
 				}
 			}
 			// 真实姓名验证
-			if (searchJson.containsKey(UserConstant.NAME.getKey())) {
-				String name = searchJson.getString(UserConstant.NAME.getKey());
+			String name = searchJson.getString(UserConstant.NAME.getKey());
+			if (StringUtils.isNotBlank(name)) {
 				if (ValidateUtil.match(UserConstant.NAME.getRegex(), name)) {
 					mapWhere = MybatisUtil.addMapWhere(mapWhere, UserConstant.NAME.getTableColumn(), OperatorConstant.LIKE, name);
 				} else {
@@ -339,8 +339,8 @@ public class UserController {
 				}
 			}
 			// 手机号码验证
-			if (searchJson.containsKey(UserConstant.PHONE.getKey())) {
-				String phone = searchJson.getString(UserConstant.PHONE.getKey());
+			String phone = searchJson.getString(UserConstant.PHONE.getKey());
+			if (StringUtils.isNotBlank(phone)) {
 				if (ValidateUtil.match("^[0-9]{1,11}$", phone)) {
 					mapWhere = MybatisUtil.addMapWhere(mapWhere, UserConstant.PHONE.getTableColumn(), OperatorConstant.LIKE, phone);
 				} else {

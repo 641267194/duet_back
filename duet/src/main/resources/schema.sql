@@ -9,7 +9,7 @@ CREATE TABLE `sys_user`  (
   `id` char(36) NOT NULL COMMENT '主键id',
   `username` varchar(50) NOT NULL COMMENT '用户名',
   `password` varchar(255) NOT NULL COMMENT '密码',
-  `name` varchar(100) NULL COMMENT '真实姓名',
+  `name` varchar(255) NULL COMMENT '真实姓名',
   `phone` varchar(20) NULL COMMENT '手机号码',
   `enabled` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否启用 1：已启用 0：禁止',
   `create_at` timestamp(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -30,7 +30,8 @@ INSERT INTO `sys_user` VALUES ('20190801144916022418df456eb455466381', 'admin', 
 DROP TABLE IF EXISTS `sys_role`;
 CREATE TABLE `sys_role`  (
   `id` char(36) NOT NULL COMMENT '主键id',
-  `name` varchar(100) NULL DEFAULT NULL COMMENT '角色名',
+  `name` varchar(255) NULL DEFAULT NULL COMMENT '角色名',
+  `code` varchar(255) NULL DEFAULT NULL COMMENT '角色编码',
   `create_at` timestamp(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_at` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE
@@ -39,7 +40,7 @@ CREATE TABLE `sys_role`  (
 -- ----------------------------
 -- Records of sys_role
 -- ----------------------------
-INSERT INTO `sys_role` VALUES ('201908011449160202894810bc9454487eba', '超级管理员', '2019-08-01 00:00:00', '2019-08-01 00:00:00');
+INSERT INTO `sys_role` VALUES ('201908011449160202894810bc9454487eba', '超级管理员', 'admin', '2019-08-01 00:00:00', '2019-08-01 00:00:00');
 
 -- ----------------------------
 -- Table structure for sys_user_role
@@ -63,9 +64,9 @@ INSERT INTO `sys_user_role` VALUES ('20190801144916022418df456eb455466381', '201
 DROP TABLE IF EXISTS `sys_module`;
 CREATE TABLE `sys_module` (
   `id` char(36) NOT NULL COMMENT '主键id',
-  `name` varchar(100) DEFAULT NULL COMMENT '模块名称',
-  `title` varchar(100) DEFAULT NULL COMMENT '模块标题',
-  `code` varchar(8) NOT NULL DEFAULT '' COMMENT '模块编码',
+  `name` varchar(255) DEFAULT NULL COMMENT '模块名称',
+  `title` varchar(255) DEFAULT NULL COMMENT '模块标题',
+  `code` varchar(255) NOT NULL DEFAULT '' COMMENT '模块编码',
   `parent_id` char(36) DEFAULT NULL COMMENT '模块的父模块id',
   `uri` varchar(255) DEFAULT NULL COMMENT '模块连接地址',
   `icon` varchar(255) DEFAULT NULL COMMENT '模块图标',
@@ -138,3 +139,28 @@ INSERT INTO `sys_role_module` VALUES ('201908011449160202894810bc9454487eba', '2
 INSERT INTO `sys_role_module` VALUES ('201908011449160202894810bc9454487eba', '201908011830420766c98b0effcd434f1487', '2019-08-01 00:00:00');
 INSERT INTO `sys_role_module` VALUES ('201908011449160202894810bc9454487eba', '201908011830420777775f9fd65c96470792', '2019-08-01 00:00:00');
 INSERT INTO `sys_role_module` VALUES ('201908011449160202894810bc9454487eba', '201908011830420787c4697552949c48dfad', '2019-08-01 00:00:00');
+
+-- ----------------------------
+-- Table structure for sys_log
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_log`;
+CREATE TABLE `sys_log`  (
+  `id` char(36) NOT NULL COMMENT '主键id',
+  `operation_event` varchar(255) NULL DEFAULT NULL COMMENT '操作事件',
+  `operation_type` varchar(255) NULL DEFAULT NULL COMMENT '操作类型',
+  `success` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否成功 1：成功 0：失败',
+  `operation_user_id` char(36) NOT NULL COMMENT '操作者id',
+  `operation_username` varchar(255) NOT NULL COMMENT '操作者用户名',
+  `remote_addr` varchar(255) NULL DEFAULT NULL COMMENT '操作IP地址',
+  `user_agent` varchar(255) NULL DEFAULT NULL COMMENT '代理',
+  `request_uri` varchar(4000) NULL DEFAULT NULL COMMENT '请求URI',
+  `method` varchar(10) NULL DEFAULT NULL COMMENT '请求类型',
+  `params` text NULL DEFAULT NULL COMMENT '请求参数',
+  `exception` text NULL DEFAULT NULL COMMENT '异常信息',
+  `create_at` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '操作时间',
+  PRIMARY KEY `index_sys_log_id` (`id`) COMMENT '主键id' USING BTREE,
+  KEY `index_sys_log_operation_event` (`operation_event`) COMMENT '操作事件' USING BTREE,
+  KEY `index_sys_log_operation_type` (`operation_type`) COMMENT '操作类型' USING BTREE,
+  KEY `index_sys_log_operation_user_id` (`operation_user_id`) COMMENT '操作者id' USING BTREE,
+  KEY `index_sys_log_operation_username` (`operation_username`) COMMENT '操作者用户名' USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '系统日志表' ROW_FORMAT = Dynamic;
