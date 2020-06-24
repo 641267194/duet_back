@@ -89,10 +89,10 @@ pagehelper:
   params: count=countSql
   
 oss:
-  accessKeyId: LTAIsqjVJCr8YJbO
-  accessKeySecret: xcv0ZShKVMf5Mc2LLlqv6EGkdEaGNx
-  endpoint: oss-cn-shanghai.aliyuncs.com
-  bucket: yunruzhi
-  url: http://yunruzhi.oss-cn-shanghai.aliyuncs.com/
+  accessKeyId: -
+  accessKeySecret: -
+  endpoint: -
+  bucket: -
+  url: -
   filesize: 5242880
   imagesize: 5242880
